@@ -72,12 +72,9 @@ jobs:
         path: bicep-template
             
     - name: 'Login to Azure using access token'
-      env:
-        AZURE_ACCESS_TOKEN: ${{ secrets.AZURE_ACCESS_TOKEN }}
-        run: |
-          az login --identity --allow-no-subscriptions
-          az account set --subscription 0ff81184-385a-4e58-ac99-23b950d699fc
-          echo $AZURE_ACCESS_TOKEN | az account get-access-token --query "accessToken" --output tsv
+      uses: Azure/azure-resource-login-action@v1.0.0
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
            
     # Deploy Azure WebApp using Bicep file
     - name: deploy
