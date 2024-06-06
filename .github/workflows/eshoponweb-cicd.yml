@@ -1,15 +1,15 @@
 name: eShopOnWeb Build and Test
 
 #Triggers (uncomment line below to use it)
-#on: [push, workflow_dispatch]
+on: [push, workflow_dispatch]
 
 #Environment variables https://docs.github.com/en/actions/learn-github-actions/environment-variables
 env:
-  RESOURCE-GROUP: rg-eshoponweb-NAME
+  RESOURCE-GROUP: rg-github
   LOCATION: westeurope
   TEMPLATE-FILE: infra/webapp.bicep
-  SUBSCRIPTION-ID: YOUR-SUBS-ID
-  WEBAPP-NAME: eshoponweb-webapp-NAME
+  SUBSCRIPTION-ID: 0ff81184-385a-4e58-ac99-23b950d699fc
+  WEBAPP-NAME: eshoponweb-webapp-rmonteiro
 
 
 jobs:
@@ -70,12 +70,14 @@ jobs:
       with:
         name: bicep-template
         path: bicep-template
-        
-   #Login in your azure subscription using a service principal (credentials stored as GitHub Secret in repo)
-    - name: Azure Login
-      uses: azure/login@v2
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+            
+    - name: 'Login to Azure using access token'
+      env:
+        AZURE_ACCESS_TOKEN: ${{ secrets.AZURE_ACCESS_TOKEN }}
+        run: |
+          az login --identity --allow-no-subscriptions
+          az account set --subscription 0ff81184-385a-4e58-ac99-23b950d699fc
+          echo $AZURE_ACCESS_TOKEN | az account get-access-token --query "accessToken" --output tsv
            
     # Deploy Azure WebApp using Bicep file
     - name: deploy
